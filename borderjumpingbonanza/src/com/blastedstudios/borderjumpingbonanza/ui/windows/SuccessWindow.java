@@ -28,7 +28,6 @@ public class SuccessWindow extends Window {
 				Gdx.app.exit();
 			}
 		});
-		row();
 		add(new Label("You have successfully crossed the border!", skin));
 		row();
 		add(okButton);

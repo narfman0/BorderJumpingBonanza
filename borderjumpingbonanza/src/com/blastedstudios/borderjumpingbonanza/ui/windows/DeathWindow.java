@@ -15,14 +15,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.blastedstudios.borderjumpingbonanza.ui.GameplayScreen;
+import com.blastedstudios.borderjumpingbonanza.ui.HighScoreScreen;
+import com.blastedstudios.borderjumpingbonanza.ui.MainScreen;
 
 public class DeathWindow extends Window {
-	private final GameplayScreen screen;
 	private final TextField nameTextfield;
+	private final long score;
 	
 	public DeathWindow(final Skin skin, final GameplayScreen screen){
 		super("Death", skin);
-		this.screen = screen;
+		final long lives = screen.getLives();
+		score = screen.getScore();
 		nameTextfield = new TextField("Anonymous", skin);
 		final Button okButton = new TextButton("Ok", skin.getStyle(TextButtonStyle.class), "ok");
 		final Button noButton = new TextButton("No", skin.getStyle(TextButtonStyle.class), "no");
@@ -30,8 +33,10 @@ public class DeathWindow extends Window {
 		okButton.setClickListener(new ClickListener() {
 			@Override public void click(Actor actor, float arg1, float arg2) {
 				actor.getStage().removeActor(actor.parent);
-				if(screen.getLives() <= 0)
+				if(lives <= 0){
 					submitScore(nameTextfield.getText());
+					screen.game.setScreen(new HighScoreScreen(screen.game));
+				}
 				screen.newLevel();
 			}
 		});
@@ -43,12 +48,12 @@ public class DeathWindow extends Window {
 		});
 		exitButton.setClickListener(new ClickListener() {
 			@Override public void click(Actor arg0, float arg1, float arg2) {
-				Gdx.app.exit();
+				screen.game.setScreen(new MainScreen(screen.game));
 			}
 		});
 		if(screen.getTimeRemaining() <= 0)
 			add(new Label("You have run out of time!", skin));
-		else if(screen.getLives() <= 0){
+		else if(lives <= 0){
 			add(new Label("You have been killed!\nWould you like to submit your high score?", skin));
 			row();
 			add(nameTextfield);
@@ -57,7 +62,7 @@ public class DeathWindow extends Window {
 		row();
 		add(okButton);
 		row();
-		if(screen.getTimeRemaining() <= 0){
+		if(lives <= 0){
 			add(noButton);
 			row();
 		}
@@ -70,11 +75,8 @@ public class DeathWindow extends Window {
 	private boolean submitScore(String name){
 		try{
 			DatagramSocket socket = new DatagramSocket();
-	        InetAddress serverIP = InetAddress.getByName("jrob.no-ip.org");
-	        String data = name + "-" + screen.getScore();
-	        byte[] outData = data.getBytes();
-	        DatagramPacket out = new DatagramPacket(outData, outData.length, serverIP, 58392);
-	        socket.send(out);
+	        byte[] outData = (name + "-" + score).getBytes();
+	        socket.send(new DatagramPacket(outData, outData.length, InetAddress.getByName("jrob.no-ip.org"), 58392));
 	        socket.close();
 		}catch(Exception e){
         	return false;

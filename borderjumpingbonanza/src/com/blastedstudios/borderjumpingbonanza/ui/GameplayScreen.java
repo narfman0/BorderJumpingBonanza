@@ -71,6 +71,8 @@ public class GameplayScreen extends AbstractScreen {
 			movement.x += 1;
 		else if(Gdx.input.isKeyPressed(Keys.F2))
 			newLevel();
+		else if(Gdx.input.isKeyPressed(Keys.BACK) || Gdx.input.isKeyPressed(Keys.ESCAPE))
+			game.setScreen(new MainScreen(game));
 		if(Gdx.input.isTouched()){
 			lastTouched = new Vector2(Gdx.input.getX()*100f/Gdx.graphics.getWidth(), 
 					(Gdx.graphics.getHeight()-Gdx.input.getY())*100f/Gdx.graphics.getHeight());

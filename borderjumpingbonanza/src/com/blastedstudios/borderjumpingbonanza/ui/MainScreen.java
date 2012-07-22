@@ -14,10 +14,16 @@ public class MainScreen extends AbstractScreen {
 	public MainScreen(final BorderJumpingBonanza game){
 		super(game);
 		final Button newGameButton = new TextButton("New Game", skin.getStyle(TextButtonStyle.class), "new");
+		final Button highScoresButton = new TextButton("High Scores", skin.getStyle(TextButtonStyle.class), "high");
 		final Button exitButton = new TextButton("Exit", skin.getStyle(TextButtonStyle.class), "exit");
 		newGameButton.setClickListener(new ClickListener() {
 			@Override public void click(Actor arg0, float arg1, float arg2) {
 				game.setScreen(new GameplayScreen(game));
+			}
+		});
+		highScoresButton.setClickListener(new ClickListener() {
+			@Override public void click(Actor actor, float arg1, float arg2) {
+				game.setScreen(new HighScoreScreen(game));
 			}
 		});
 		exitButton.setClickListener(new ClickListener() {
@@ -27,6 +33,8 @@ public class MainScreen extends AbstractScreen {
 		});
 		Window window = new Window("Border Jumping Bonanza", skin.getStyle(WindowStyle.class), "window");
 		window.add(newGameButton);
+		window.row();
+		window.add(highScoresButton);
 		window.row();
 		window.add(exitButton);
 		window.pack();

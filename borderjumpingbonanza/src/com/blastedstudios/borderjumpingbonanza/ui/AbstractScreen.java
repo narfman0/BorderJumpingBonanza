@@ -10,7 +10,7 @@ import com.blastedstudios.borderjumpingbonanza.BorderJumpingBonanza;
 public abstract class AbstractScreen implements Screen{
 	protected Stage stage;
 	protected Skin skin;
-	protected BorderJumpingBonanza game;
+	public final BorderJumpingBonanza game;
 	
 	public AbstractScreen(BorderJumpingBonanza game){
 		this.game = game;
