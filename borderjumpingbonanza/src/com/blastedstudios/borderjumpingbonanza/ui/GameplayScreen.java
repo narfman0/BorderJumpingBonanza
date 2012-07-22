@@ -10,12 +10,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.blastedstudios.borderjumpingbonanza.BorderJumpingBonanza;
+import com.blastedstudios.borderjumpingbonanza.ui.windows.DeathWindow;
+import com.blastedstudios.borderjumpingbonanza.ui.windows.SuccessWindow;
 
 public class GameplayScreen extends AbstractScreen {
 	private SpriteBatch batch;
 	private static Texture background, mexican, truck, cutter, barge;
 	private Vector2 location, lastTouched;
-	private boolean touchMove;
+	private boolean touchMove, skipUpdate;
 	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10, DETECT_RANGE = 10f;
 	private int difficulty = 3;
 	private ArrayList<Being> enemies;
@@ -34,7 +36,8 @@ public class GameplayScreen extends AbstractScreen {
 	}
 
 	@Override public void render(float delta) {
-		update(delta);
+		if(!skipUpdate)
+			update(delta);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -44,6 +47,8 @@ public class GameplayScreen extends AbstractScreen {
 			batch.draw(enemy.texture, enemy.location.x/100 * Gdx.graphics.getWidth() - 18, 
 					enemy.location.y/100 * Gdx.graphics.getHeight() - 18, 36, 36);
 		batch.end();
+		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+		stage.draw();
 	}
 
 	private void update(float delta) {
@@ -86,15 +91,18 @@ public class GameplayScreen extends AbstractScreen {
 		
 		if(location.y > 95){
 			++difficulty;
-			newLevel();
+			skipUpdate = true;
+			stage.addActor(new SuccessWindow(skin, this));
 		}
 
-		if(detectCollision(location, null))
-			newLevel();
+		if(detectCollision(location, null)){
+			skipUpdate = true;
+			stage.addActor(new DeathWindow(skin, this));
+		}
 	}
 	
-	private void newLevel(){
-		touchMove = false;
+	public void newLevel(){
+		skipUpdate = touchMove = false;
 		enemies = new ArrayList<Being>();
 		for(int i=0; i<difficulty; i++){
 			int row = BorderJumpingBonanza.random.nextInt((int)ROWS);
