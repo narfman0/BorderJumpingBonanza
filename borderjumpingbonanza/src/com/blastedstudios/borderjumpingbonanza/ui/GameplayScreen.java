@@ -14,7 +14,8 @@ import com.blastedstudios.borderjumpingbonanza.BorderJumpingBonanza;
 public class GameplayScreen extends AbstractScreen {
 	private SpriteBatch batch;
 	private static Texture background, mexican, truck, cutter, barge;
-	private Vector2 location;
+	private Vector2 location, lastTouched;
+	private boolean touchMove;
 	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10;
 	private int difficulty = 3;
 	private ArrayList<Being> enemies;
@@ -46,16 +47,30 @@ public class GameplayScreen extends AbstractScreen {
 	}
 
 	private void update(float delta) {
+		Vector2 movement = new Vector2();
 		if(Gdx.input.isKeyPressed(Keys.UP))
-			location.y += MOVEMENT_MODIFIER;
+			movement.y += 1;
 		else if(Gdx.input.isKeyPressed(Keys.DOWN))
-			location.y -= MOVEMENT_MODIFIER;
+			movement.y -= 1;
 		if(Gdx.input.isKeyPressed(Keys.LEFT))
-			location.x -= MOVEMENT_MODIFIER;
+			movement.x -= 1;
 		else if(Gdx.input.isKeyPressed(Keys.RIGHT))
-			location.x += MOVEMENT_MODIFIER;
+			movement.x += 1;
 		else if(Gdx.input.isKeyPressed(Keys.F2))
 			newLevel();
+		if(Gdx.input.isTouched()){
+			lastTouched = new Vector2(Gdx.input.getX()*100f/Gdx.graphics.getWidth(), 
+					(Gdx.graphics.getHeight()-Gdx.input.getY())*100f/Gdx.graphics.getHeight());
+			touchMove = true;
+		}
+		if(touchMove){
+			if(lastTouched.dst2(location) > 1)
+				movement = lastTouched.tmp().sub(location).nor();
+			else
+				touchMove = false;
+		}
+		movement.nor();
+		location.add(movement.mul(MOVEMENT_MODIFIER));
 		location.x = Math.max(10, Math.min(90, location.x));
 		location.y = Math.max(10, location.y);
 		
@@ -74,6 +89,7 @@ public class GameplayScreen extends AbstractScreen {
 	}
 	
 	private void newLevel(){
+		touchMove = false;
 		enemies = new ArrayList<Being>();
 		for(int i=0; i<difficulty; i++){
 			int row = BorderJumpingBonanza.random.nextInt((int)ROWS);
