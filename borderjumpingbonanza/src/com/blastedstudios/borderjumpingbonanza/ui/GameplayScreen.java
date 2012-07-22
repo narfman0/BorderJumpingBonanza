@@ -18,7 +18,7 @@ import com.blastedstudios.borderjumpingbonanza.ui.windows.SuccessWindow;
 public class GameplayScreen extends AbstractScreen {
 	private SpriteBatch batch;
 	private static Texture background, mexican, truck, cutter, barge;
-	private static Sound success;
+	private static Sound success, nomegusta;
 	private Vector2 location, lastTouched;
 	private boolean touchMove, skipUpdate;
 	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10, DETECT_RANGE = 10f;
@@ -34,7 +34,8 @@ public class GameplayScreen extends AbstractScreen {
 			truck = new Texture(Gdx.files.internal("data/textures/truck.png"), Format.RGBA8888, true);
 			cutter = new Texture(Gdx.files.internal("data/textures/cutter.png"), Format.RGBA8888, true);
 			barge = new Texture(Gdx.files.internal("data/textures/barge.png"), Format.RGBA8888, true);
-			success = Gdx.audio.newSound(Gdx.files.internal("data/Success.ogg"));
+			success = Gdx.audio.newSound(Gdx.files.internal("data/sounds/Success.ogg"));
+			nomegusta = Gdx.audio.newSound(Gdx.files.internal("data/sounds/nomegusta.ogg"));
 		}
 		batch = new SpriteBatch();
 		newLevel();
@@ -104,6 +105,7 @@ public class GameplayScreen extends AbstractScreen {
 		}
 
 		if(detectCollision(location, null) || getTimeRemaining() <= 0){
+			nomegusta.play();
 			skipUpdate = true;
 			stage.addActor(new DeathWindow(skin, this));
 		}
