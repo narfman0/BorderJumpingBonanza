@@ -30,8 +30,10 @@ public class DeathWindow extends Window {
 		row();
 		if(screen.getTimeRemaining() <= 0)
 			add(new Label("You have run out of time!", skin));
-		else
+		else if(screen.getLives() <= 0)
 			add(new Label("You have been killed!", skin));
+		else
+			add(new Label("You have been hit!", skin));
 		row();
 		add(okButton);
 		row();

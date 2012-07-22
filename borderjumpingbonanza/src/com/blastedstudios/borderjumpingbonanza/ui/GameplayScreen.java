@@ -22,7 +22,7 @@ public class GameplayScreen extends AbstractScreen {
 	private Vector2 location, lastTouched;
 	private boolean touchMove, skipUpdate;
 	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10, DETECT_RANGE = 10f;
-	private long difficulty = 3, score, timeLevelBegin;
+	private long difficulty = 3, score, timeLevelBegin, lives;
 	private static long LEVEL_TIME = 60000;
 	private ArrayList<Being> enemies;
 
@@ -38,6 +38,7 @@ public class GameplayScreen extends AbstractScreen {
 			nomegusta = Gdx.audio.newSound(Gdx.files.internal("data/sounds/nomegusta.ogg"));
 		}
 		batch = new SpriteBatch();
+		lives = 3;
 		newLevel();
 		stage.addActor(new InfoWindow(skin, this));
 	}
@@ -101,11 +102,17 @@ public class GameplayScreen extends AbstractScreen {
 			++difficulty;
 			skipUpdate = true;
 			score += (difficulty * getTimeRemaining()); 
+			lives += (getLevel() % 2);
 			stage.addActor(new SuccessWindow(skin, this));
 		}
 
 		if(detectCollision(location, null) || getTimeRemaining() <= 0){
 			nomegusta.play();
+			lives--;
+			if(lives <= 0){
+				difficulty = 3;
+				score = 0;
+			}
 			skipUpdate = true;
 			stage.addActor(new DeathWindow(skin, this));
 		}
@@ -151,6 +158,10 @@ public class GameplayScreen extends AbstractScreen {
 
 	public long getScore() {
 		return score;
+	}
+	
+	public long getLives(){
+		return lives;
 	}
 	
 	private class Being{

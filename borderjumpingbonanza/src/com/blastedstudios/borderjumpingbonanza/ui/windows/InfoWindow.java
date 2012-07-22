@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.blastedstudios.borderjumpingbonanza.ui.GameplayScreen;
 
 public class InfoWindow extends Window {
-	private Label levelLabel, scoreLabel, timeLabel;
+	private Label levelLabel, scoreLabel, timeLabel, livesLabel;
 	private final GameplayScreen screen;
 	
 	public InfoWindow(final Skin skin, final GameplayScreen screen){
@@ -19,6 +19,7 @@ public class InfoWindow extends Window {
 		add(levelLabel = new Label("", skin)).pad(6);
 		add(scoreLabel = new Label("", skin)).pad(6);
 		add(timeLabel = new Label("", skin)).pad(6);
+		add(livesLabel = new Label("", skin)).pad(6);
 		pack();
 		width = 300;
 		height = 40;
@@ -30,6 +31,7 @@ public class InfoWindow extends Window {
 		levelLabel.setText("Level: " + screen.getLevel());
 		scoreLabel.setText("Score: " + screen.getScore());
 		timeLabel.setText("Time: " + screen.getTimeRemaining());
+		livesLabel.setText("Lives: " + screen.getLives());
 	}
 	
 	private class UpdateLabelTimer extends TimerTask{
