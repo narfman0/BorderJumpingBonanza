@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.blastedstudios.borderjumpingbonanza.BorderJumpingBonanza;
 import com.blastedstudios.borderjumpingbonanza.ui.windows.DeathWindow;
+import com.blastedstudios.borderjumpingbonanza.ui.windows.InfoWindow;
 import com.blastedstudios.borderjumpingbonanza.ui.windows.SuccessWindow;
 
 public class GameplayScreen extends AbstractScreen {
@@ -19,7 +20,8 @@ public class GameplayScreen extends AbstractScreen {
 	private Vector2 location, lastTouched;
 	private boolean touchMove, skipUpdate;
 	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10, DETECT_RANGE = 10f;
-	private int difficulty = 3;
+	private long difficulty = 3, score, timeLevelBegin;
+	private static long LEVEL_TIME = 60000;
 	private ArrayList<Being> enemies;
 
 	public GameplayScreen(final BorderJumpingBonanza game){
@@ -33,6 +35,7 @@ public class GameplayScreen extends AbstractScreen {
 		}
 		batch = new SpriteBatch();
 		newLevel();
+		stage.addActor(new InfoWindow(skin, this));
 	}
 
 	@Override public void render(float delta) {
@@ -92,6 +95,7 @@ public class GameplayScreen extends AbstractScreen {
 		if(location.y > 95){
 			++difficulty;
 			skipUpdate = true;
+			score += (difficulty * getTimeRemaining()); 
 			stage.addActor(new SuccessWindow(skin, this));
 		}
 
@@ -107,10 +111,14 @@ public class GameplayScreen extends AbstractScreen {
 		for(int i=0; i<difficulty; i++){
 			int row = BorderJumpingBonanza.random.nextInt((int)ROWS);
 			Texture texture = row < ROWS/2 ? truck : BorderJumpingBonanza.random.nextBoolean() ? barge : cutter;
-			Vector2 location = new Vector2(5 + BorderJumpingBonanza.random.nextFloat()*85, 7.14f*row + (row<ROWS/2?18:25));
+			Vector2 location;
+			do{
+				location = new Vector2(5 + BorderJumpingBonanza.random.nextFloat()*85, 7.14f*row + (row<ROWS/2?18:25));
+			}while(detectCollision(location, null));
 			enemies.add(new Being(texture, location));
 		}
 		location = new Vector2(50, 10);
+		timeLevelBegin = System.currentTimeMillis();
 	}
 	
 	/**
@@ -125,6 +133,18 @@ public class GameplayScreen extends AbstractScreen {
 		if(detector != null && this.location.dst2(location) < DETECT_RANGE)
 			return true;
 		return false;
+	}
+	
+	public long getLevel(){
+		return difficulty - 2;
+	}
+	
+	public long getTimeRemaining(){
+		return (LEVEL_TIME - System.currentTimeMillis() + timeLevelBegin)/1000;
+	}
+
+	public long getScore() {
+		return score;
 	}
 	
 	private class Being{
