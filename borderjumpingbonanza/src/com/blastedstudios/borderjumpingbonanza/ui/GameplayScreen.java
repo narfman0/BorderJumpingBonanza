@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,6 +18,7 @@ import com.blastedstudios.borderjumpingbonanza.ui.windows.SuccessWindow;
 public class GameplayScreen extends AbstractScreen {
 	private SpriteBatch batch;
 	private static Texture background, mexican, truck, cutter, barge;
+	private static Sound success;
 	private Vector2 location, lastTouched;
 	private boolean touchMove, skipUpdate;
 	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10, DETECT_RANGE = 10f;
@@ -32,6 +34,7 @@ public class GameplayScreen extends AbstractScreen {
 			truck = new Texture(Gdx.files.internal("data/textures/truck.png"), Format.RGBA8888, true);
 			cutter = new Texture(Gdx.files.internal("data/textures/cutter.png"), Format.RGBA8888, true);
 			barge = new Texture(Gdx.files.internal("data/textures/barge.png"), Format.RGBA8888, true);
+			success = Gdx.audio.newSound(Gdx.files.internal("data/Success.ogg"));
 		}
 		batch = new SpriteBatch();
 		newLevel();
@@ -93,13 +96,14 @@ public class GameplayScreen extends AbstractScreen {
 		}
 		
 		if(location.y > 95){
+			success.play();
 			++difficulty;
 			skipUpdate = true;
 			score += (difficulty * getTimeRemaining()); 
 			stage.addActor(new SuccessWindow(skin, this));
 		}
 
-		if(detectCollision(location, null)){
+		if(detectCollision(location, null) || getTimeRemaining() <= 0){
 			skipUpdate = true;
 			stage.addActor(new DeathWindow(skin, this));
 		}
