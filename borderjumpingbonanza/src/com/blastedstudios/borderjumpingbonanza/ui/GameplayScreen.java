@@ -16,7 +16,7 @@ public class GameplayScreen extends AbstractScreen {
 	private static Texture background, mexican, truck, cutter, barge;
 	private Vector2 location, lastTouched;
 	private boolean touchMove;
-	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10;
+	private static float MOVEMENT_MODIFIER = .2f, ROWS = 10, DETECT_RANGE = 10f;
 	private int difficulty = 3;
 	private ArrayList<Being> enemies;
 
@@ -39,7 +39,7 @@ public class GameplayScreen extends AbstractScreen {
 		batch.begin();
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.draw(mexican, location.x/100 * Gdx.graphics.getWidth() - 18, 
-				location.y/100 * Gdx.graphics.getHeight() - 18, 38, 45);
+				location.y/100 * Gdx.graphics.getHeight() - 18, 38, 44);
 		for(Being enemy : enemies)
 			batch.draw(enemy.texture, enemy.location.x/100 * Gdx.graphics.getWidth() - 18, 
 					enemy.location.y/100 * Gdx.graphics.getHeight() - 18, 36, 36);
@@ -80,12 +80,17 @@ public class GameplayScreen extends AbstractScreen {
 				enemy.isLeft = false;
 			if(enemy.location.x > 90)
 				enemy.isLeft = true;
+			if(detectCollision(enemy.location, enemy))
+				enemy.isLeft = !enemy.isLeft;
 		}
 		
 		if(location.y > 95){
 			++difficulty;
 			newLevel();
 		}
+
+		if(detectCollision(location, null))
+			newLevel();
 	}
 	
 	private void newLevel(){
@@ -98,6 +103,20 @@ public class GameplayScreen extends AbstractScreen {
 			enemies.add(new Being(texture, location));
 		}
 		location = new Vector2(50, 10);
+	}
+	
+	/**
+	 * @param location of the entity checking if is colliding with something
+	 * @param detector being doing detection. if player, this is null
+	 * @return whether or not the two objects collide
+	 */
+	private boolean detectCollision(Vector2 location, Being detector){
+		for(Being enemy : enemies)
+			if(detector != enemy && enemy.location.dst2(location) < DETECT_RANGE)
+				return true;
+		if(detector != null && this.location.dst2(location) < DETECT_RANGE)
+			return true;
+		return false;
 	}
 	
 	private class Being{
