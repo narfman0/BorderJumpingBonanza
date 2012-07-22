@@ -109,12 +109,12 @@ public class GameplayScreen extends AbstractScreen {
 		if(detectCollision(location, null) || getTimeRemaining() <= 0){
 			nomegusta.play();
 			lives--;
+			stage.addActor(new DeathWindow(skin, this));
 			if(lives <= 0){
-				difficulty = 3;
+				lives = difficulty = 3;
 				score = 0;
 			}
 			skipUpdate = true;
-			stage.addActor(new DeathWindow(skin, this));
 		}
 	}
 	
