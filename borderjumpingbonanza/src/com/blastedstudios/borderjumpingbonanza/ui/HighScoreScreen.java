@@ -1,6 +1,6 @@
 package com.blastedstudios.borderjumpingbonanza.ui;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -8,14 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.blastedstudios.borderjumpingbonanza.BorderJumpingBonanza;
-import com.blastedstudios.borderjumpingbonanza.ui.AbstractScreen;
-import com.blastedstudios.borderjumpingbonanza.ui.GameplayScreen;
+import com.blastedstudios.borderjumpingbonanza.game.HighScoreStruct;
+import com.blastedstudios.borderjumpingbonanza.game.Scores;
 
 public class HighScoreScreen extends AbstractScreen {
-	private static ArrayList<HighScoreStruct> highScores = new ArrayList<HighScoreStruct>();
 
 	public HighScoreScreen(final BorderJumpingBonanza game){
 		super(game);
@@ -36,6 +35,7 @@ public class HighScoreScreen extends AbstractScreen {
 		window.add(new Label("Name", skin)).pad(6);
 		window.add(new Label("Score", skin)).pad(6);
 		window.row();
+		List<HighScoreStruct> highScores = Scores.getHighScores();
 		for(int i=0; i<10; i++){
 			HighScoreStruct struct = highScores.size()>i ? highScores.get(i) : new HighScoreStruct("",0);
 			window.add(new Label(i + ". ", skin));
@@ -50,15 +50,5 @@ public class HighScoreScreen extends AbstractScreen {
 		window.x = Gdx.graphics.getWidth()/2 - window.width/2;
 		window.y = Gdx.graphics.getHeight()/2 - window.height/2;
 		stage.addActor(window);
-	}
-	
-	private class HighScoreStruct{
-		public final long score;
-		public final String name;
-		
-		public HighScoreStruct(String name, long score){
-			this.name = name;
-			this.score = score;
-		}
 	}
 }

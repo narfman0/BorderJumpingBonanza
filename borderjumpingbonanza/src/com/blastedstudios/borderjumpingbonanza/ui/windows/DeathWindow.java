@@ -1,9 +1,5 @@
 package com.blastedstudios.borderjumpingbonanza.ui.windows;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -11,21 +7,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.blastedstudios.borderjumpingbonanza.game.Scores;
 import com.blastedstudios.borderjumpingbonanza.ui.GameplayScreen;
 import com.blastedstudios.borderjumpingbonanza.ui.HighScoreScreen;
 import com.blastedstudios.borderjumpingbonanza.ui.MainScreen;
 
 public class DeathWindow extends Window {
 	private final TextField nameTextfield;
-	private final long score;
 	
 	public DeathWindow(final Skin skin, final GameplayScreen screen){
 		super("Death", skin);
-		final long lives = screen.getLives();
-		score = screen.getScore();
+		final long lives = screen.getLives(), score = screen.getScore();
 		nameTextfield = new TextField("Anonymous", skin);
 		final Button okButton = new TextButton("Ok", skin.getStyle(TextButtonStyle.class), "ok");
 		final Button noButton = new TextButton("No", skin.getStyle(TextButtonStyle.class), "no");
@@ -34,7 +29,7 @@ public class DeathWindow extends Window {
 			@Override public void click(Actor actor, float arg1, float arg2) {
 				actor.getStage().removeActor(actor.parent);
 				if(lives <= 0){
-					submitScore(nameTextfield.getText());
+					Scores.submitScore(nameTextfield.getText(), score);
 					screen.game.setScreen(new HighScoreScreen(screen.game));
 				}
 				screen.newLevel();
@@ -70,17 +65,5 @@ public class DeathWindow extends Window {
 		pack();
 		x = Gdx.graphics.getWidth()/2 - width/2;
 		y = Gdx.graphics.getHeight()/2 - height/2;
-	}
-	
-	private boolean submitScore(String name){
-		try{
-			DatagramSocket socket = new DatagramSocket();
-	        byte[] outData = (name + "-" + score).getBytes();
-	        socket.send(new DatagramPacket(outData, outData.length, InetAddress.getByName("jrob.no-ip.org"), 58392));
-	        socket.close();
-		}catch(Exception e){
-        	return false;
-        }
-        return true;
 	}
 }

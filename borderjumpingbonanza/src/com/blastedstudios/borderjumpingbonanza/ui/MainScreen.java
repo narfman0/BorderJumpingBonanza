@@ -17,7 +17,7 @@ public class MainScreen extends AbstractScreen {
 		final Button highScoresButton = new TextButton("High Scores", skin.getStyle(TextButtonStyle.class), "high");
 		final Button exitButton = new TextButton("Exit", skin.getStyle(TextButtonStyle.class), "exit");
 		newGameButton.setClickListener(new ClickListener() {
-			@Override public void click(Actor arg0, float arg1, float arg2) {
+			@Override public void click(Actor actor, float arg1, float arg2) {
 				game.setScreen(new GameplayScreen(game));
 			}
 		});
@@ -27,7 +27,7 @@ public class MainScreen extends AbstractScreen {
 			}
 		});
 		exitButton.setClickListener(new ClickListener() {
-			@Override public void click(Actor arg0, float arg1, float arg2) {
+			@Override public void click(Actor actor, float arg1, float arg2) {
 				Gdx.app.exit();
 			}
 		});
